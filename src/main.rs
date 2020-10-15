@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::process;
+use std::error::Error;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,13 +13,19 @@ fn main() {
     println!("Поиск {}", config.query);
     println!("В файле {}", config.filename);
 
-    run(config);
+    if let Err(e) = run(config) {
+        println!("Ошибка в приложении: {}", e);
+
+        process::exit(1);
+    }
 }
 
-fn run(config: Config) {
-    let contents = fs::read_to_string(config.filename)
-        .expect("Что-то пошло не так при чтении файла.");
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
+
     println!("С текстом:\n{}", contents);
+
+    Ok(())
 }
 
 struct Config {
